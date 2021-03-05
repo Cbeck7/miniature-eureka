@@ -43,6 +43,9 @@
   Once a battle concludes, the user has the option of repeating the above
 
 */
+import java.util.*;
+
+
 public class Dungeon
 {
     public static void main(String[] args)
@@ -50,7 +53,6 @@ public class Dungeon
 
 		Hero theHero;
 		Monster theMonster;
-
 		do
 		{
 		    theHero = chooseHero();
@@ -70,24 +72,50 @@ this task
 	{
 		int choice;
 		Hero theHero;
-
-		System.out.println("Choose a hero:\n" +
-					       "1. Warrior\n" +
-						   "2. Sorceress\n" +
-						   "3. Thief");
-		choice = Keyboard.readInt();
-
-		switch(choice)
-		{
-			case 1: return new Warrior();
-
-			case 2: return new Sorceress();
-
-			case 3: return new Thief();
-
-			default: System.out.println("invalid choice, returning Thief");
-				     return new Thief();
-		}//end switch
+		
+		/*
+		 * Change from random class if user out of bounds to a loop reset
+		 */
+		boolean inRange = false;
+		
+		do {
+			System.out.println("Choose a hero:\n" +
+						       "1. Warrior\n" +
+							   "2. Sorceress\n" +
+							   "3. Thief");
+			choice = Keyboard.readInt();
+			
+			if(choice == 1) {
+				inRange = true;
+				return new Warrior();
+			}else if(choice == 2) {
+				inRange = true;
+				return new Sorceress();
+			}else if(choice == 3) {
+				inRange = true;
+				return new Thief();
+			}else {
+				inRange = false;
+				System.out.println("Invalid selection, try again");
+			}
+			
+			/*
+			switch(choice)
+			{
+				case 1: return new Warrior();
+	
+				case 2: return new Sorceress();
+	
+				case 3: return new Thief();
+				
+				default: System.out.println("invalid choice, returning Thief");
+					     return new Thief();
+					      
+			}//end switch
+			*/
+			
+		}while(inRange == false);
+		return null;
 	}//end chooseHero method
 
 /*-------------------------------------------------------------------
@@ -99,7 +127,7 @@ a polymorphic reference (Monster) to accomplish this task.
 		int choice;
 
 		choice = (int)(Math.random() * 3) + 1;
-
+		
 		switch(choice)
 		{
 			case 1: return new Ogre();
@@ -134,15 +162,24 @@ and a Monster to be passed in.  Battle occurs in rounds.  The Hero
 goes first, then the Monster.  At the conclusion of each round, the
 user has the option of quitting.
 ---------------------------------------------------------------------*/
+	
+	/*
+	 * change pause to a string so that the user may continue with just enter
+	 * As a note to you guys if we don't want to implement this we really don't have to 
+	 * however upon closer inspection of keyboard we might be able to write our way around
+	 * keyboard entirely and that is definitely a refactor, or more accurately leads to several other refactors
+	 */
 	public static void battle(Hero theHero, Monster theMonster)
 	{
-		char pause = 'p';
+		char pause = 'p'; 
+		//Scanner scanner = new Scanner(System.in); //added
+		//String input = "";
 		System.out.println(theHero.getName() + " battles " +
 							theMonster.getName());
 		System.out.println("---------------------------------------------");
 
 		//do battle
-		while (theHero.isAlive() && theMonster.isAlive() && pause != 'q')
+		while (theHero.isAlive() && theMonster.isAlive() && pause != 'q') 
 		{
 		    //hero goes first
 			theHero.battleChoices(theMonster);
@@ -153,8 +190,13 @@ user has the option of quitting.
 
 			//let the player bail out if desired
 			System.out.print("\n-->q to quit, anything else to continue: ");
+			
 			pause = Keyboard.readChar();
-
+			//input = scanner.nextLine().substring(0,1);
+			//scanner.nextLine();
+			//pause = input.trim(); //changed
+			//scanner.nextLine();
+			
 		}//end battle loop
 
 		if (!theMonster.isAlive())
