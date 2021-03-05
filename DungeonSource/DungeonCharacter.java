@@ -39,7 +39,7 @@ public abstract class DungeonCharacter implements Comparable
 	protected String name;
 	protected int hitPoints;
 	protected int attackSpeed;
-	protected double chanceToHit;
+	protected double hitChance;
 	protected int damageMin, damageMax;
 
 	public int compareTo(Object o)
@@ -57,7 +57,7 @@ public abstract class DungeonCharacter implements Comparable
 		this.name = name;
 		this.hitPoints = hitPoints;
 		this.attackSpeed = attackSpeed;
-		this.chanceToHit = chanceToHit;
+		this.hitChance = chanceToHit;
 		this.damageMin = damageMin;
 		this.damageMax = damageMax;
 
@@ -113,23 +113,32 @@ Returns: nothing
 This method calls: nothing
 This method is called by: overridden versions in Hero and Monster
 ---------------------------------------------------------*/
+	/*
+	 * changed some checks from equality to <=
+	 * deleted some lines
+	 * this also allows for advancing so that characters can be placed in down but not out state
+	 * ex: skeleton could reanimate
+	 */
 	public void subtractHitPoints(int hitPoints)
 	{
-		if (hitPoints <0)
+		if (hitPoints < 0)
 			System.out.println("Hitpoint amount must be positive.");
-		else if (hitPoints >0)
+		else if (hitPoints > 0)
 		{
 			this.hitPoints -= hitPoints;
+			/*
 			if (this.hitPoints < 0)
 				this.hitPoints = 0;
+			*/
 			System.out.println(getName() + " hit " +
 								" for <" + hitPoints + "> points damage.");
 			System.out.println(getName() + " now has " +
 								getHitPoints() + " hit points remaining.");
 			System.out.println();
 		}//end else if
-
-		if (this.hitPoints == 0)
+		
+		//changed
+		if (this.hitPoints <= 0)
 			System.out.println(name + " has been killed :-(");
 
 
@@ -144,9 +153,21 @@ Returns: true is hero is alive, false otherwise
 This method calls: nothing
 This method is called by: unknown (intended for external use)
 ---------------------------------------------------------*/
-    public boolean isAlive()
+    
+	/*
+	 * clarity edits
+	 */
+	public boolean isAlive()
 	{
-	  return (hitPoints > 0);
+		//added
+		boolean alive;
+		if(hitPoints < 0) {
+			alive = false;
+		}else {
+			alive = true;
+		}
+		
+		return alive; //changed
 	}//end isAlive method
 
 /*-------------------------------------------------------
@@ -161,12 +182,34 @@ This method calls: Math.random(), subtractHitPoints()
 This method is called by: overridden versions of the method in monster and
 hero classes and externally
 ---------------------------------------------------------*/
+	
+	/*
+	 * chanceToHit refactored to hitChance
+	 * hitChance should be random, blockChance should be set
+	 * More than I want to do today so ill stub out my idea in comments
+	 * might need to take in two DungeonCharacters: attacker/defender
+	 * rework the canAttack if to become switch statements: 0 = crit fail, 1 = normal, 2 = crit success
+	 */
 	public void attack(DungeonCharacter opponent)
 	{
 		boolean canAttack;
 		int damage;
-
-		canAttack = Math.random() <= chanceToHit;
+		
+		/*
+		 * int attack = Math.randomInt()  say a range of 1-20;
+		 * if desired hitChance could be a constant mod of plus 2, 0, 3 for the classes
+		 * if(attack == 20) {
+		 * System.out.println(critical hit!), double damage
+		 * }else if(attack == 1) {
+		 * System.out.println(you damaged yourself!), deal quarter damage to self
+		 * }else {
+		 * attack += hitChance;
+		 * if(attack > opponent.blockChance) {
+		 * 		canAttack = true;
+		 * }
+		 */
+		
+		canAttack = Math.random() <= hitChance;
 
 		if (canAttack)
 		{
